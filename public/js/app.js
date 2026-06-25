@@ -1,4 +1,4 @@
-import { quickCheck } from "./heuristics.js?v=4";
+import { quickCheck } from "./heuristics.js?v=5";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -26,8 +26,10 @@ const disclaimer = $("#disclaimer");
 const GAUGE_ARC = 251.2;
 
 const VERDICT_COPY = {
-  likely_human: "Few surface patterns — but polished AI (Claude, GPT-4) often looks like this. Not proof of human authorship.",
-  uncertain: "Mixed surface signals — could be edited human prose or polished AI. Read critically.",
+  likely_human: "Some surface patterns lean human — still not proof, especially on short or literary text.",
+  uncertain: "Mixed or weak signals — could be human, could be polished AI (Claude, GPT-4). Read critically.",
+  uncertain_low:
+    "Very few patterns detected — polished AI often scores this low. Not enough signal to call it human.",
   likely_ai: "Multiple AI surface patterns detected. Still not proof — use judgment.",
 };
 
@@ -49,6 +51,7 @@ function setScanning(on) {
 }
 
 function gaugeColor(pct) {
+  if (pct < 25) return "#f5b942";
   if (pct < 35) return "#3dd68c";
   if (pct < 60) return "#f5b942";
   return "#ff6b4a";
@@ -68,8 +71,14 @@ function verdictClass(v) {
   return "verdict__badge--uncertain";
 }
 
-function verdictLabel(v) {
+function verdictLabel(v, conf) {
+  if (v === "uncertain" && conf === "low") return "Uncertain (low confidence)";
   return { likely_human: "Likely human", uncertain: "Uncertain", likely_ai: "Likely AI" }[v] || v;
+}
+
+function verdictCopyKey(v, conf) {
+  if (v === "uncertain" && conf === "low") return "uncertain_low";
+  return v;
 }
 
 function renderSignals(signals) {
@@ -99,9 +108,9 @@ function renderReport(report) {
   emptyState.hidden = true;
   results.hidden = false;
   setGauge(report.ai_likelihood_pct);
-  verdictBadge.textContent = verdictLabel(report.overall_verdict);
+  verdictBadge.textContent = verdictLabel(report.overall_verdict, report.confidence);
   verdictBadge.className = `verdict__badge ${verdictClass(report.overall_verdict)}`;
-  verdictCopy.textContent = VERDICT_COPY[report.overall_verdict] || "";
+  verdictCopy.textContent = VERDICT_COPY[verdictCopyKey(report.overall_verdict, report.confidence)] || "";
   scanMode.textContent = "In-browser";
   surfaceScore.textContent = `${report.surface_score}/100 (${report.surface_verdict})`;
   confidence.textContent = report.confidence;

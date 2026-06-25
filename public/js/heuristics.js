@@ -118,7 +118,9 @@ function literaryPhraseHits(text) {
 }
 
 function overallVerdict(aiPct) {
-  if (aiPct < 28) return ["likely_human", "low"];
+  // Low scores are not evidence of human writing — polished AI often lands here
+  if (aiPct < 25) return ["uncertain", "low"];
+  if (aiPct < 35) return ["likely_human", "low"];
   if (aiPct < 52) return ["uncertain", "medium"];
   if (aiPct < 72) return ["likely_ai", "medium"];
   return ["likely_ai", "high"];
