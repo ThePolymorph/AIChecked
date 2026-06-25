@@ -182,6 +182,9 @@
           <p>Polished literary AI (Claude, GPT-4) often avoids obvious tells. This is a red-flag pass, not forensic proof. Use your judgement.</p>
         </article>
       </div>
+      <aside class="how__credit" aria-label="Research credits">
+        <p><strong>Research credit.</strong> The live browser scan uses heuristics we built for AIChecked. Work on a deeper statistical layer follows <a href="https://arxiv.org/abs/2401.12070" rel="noopener noreferrer">Binoculars</a> (Hans et al., ICML 2024) and ideas from <a href="https://arxiv.org/abs/2301.11305" rel="noopener noreferrer">DetectGPT</a> (Mitchell et al., ICML 2023). Self-hosted experiments use <a href="https://huggingface.co/openai-community/gpt2" rel="noopener noreferrer">GPT-2</a> and GPT-2-medium (OpenAI, modified MIT licence) via Hugging Face Transformers.</p>
+      </aside>
     </section>
 
     <section class="prompt-section" id="humanizer-prompt">
@@ -259,11 +262,12 @@
 
   <footer class="footer">
     <nav class="footer__links" aria-label="Legal">
+      <a href="/blog/deeper-analysis.html">Blog</a>
       <a href="/privacy.html">Privacy</a>
       <a href="/terms.html">Terms</a>
     </nav>
     <p><strong>AIChecked.com</strong>, research tool, not a courtroom.</p>
-    <p class="footer__fine">Inspired by Binoculars (Hans et al., 2024) and DetectGPT (Mitchell et al., 2023). Runs locally with open-source models.</p>
+    <p class="footer__fine">Heuristics by AIChecked. Statistical research draws on <a href="https://arxiv.org/abs/2401.12070" rel="noopener noreferrer">Binoculars</a> (Hans et al., 2024) and <a href="https://arxiv.org/abs/2301.11305" rel="noopener noreferrer">DetectGPT</a> (Mitchell et al., 2023).</p>
   </footer>
 
   <script src="/js/app.js?v=15" type="module"></script>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Could AIChecked go deeper? | AIChecked blog</title>
+  <meta name="description" content="What we're considering for stronger AI writing checks on AIChecked, when paid detectors may suit you better, and why the free scanner stays in your browser for now." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://aichecked.com/blog/deeper-analysis.html" />
+  <meta name="theme-color" content="#060a12" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3PXBR685H8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-3PXBR685H8");
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--a" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--b" aria-hidden="true"></div>
+
+  <header class="header">
+    <a class="logo" href="/">
+      <span class="logo__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="16" r="4" fill="currentColor"/><line x1="16" y1="3" x2="16" y2="9" stroke="currentColor" stroke-width="1.5"/><line x1="16" y1="23" x2="16" y2="29" stroke="currentColor" stroke-width="1.5"/><line x1="3" y1="16" x2="9" y2="16" stroke="currentColor" stroke-width="1.5"/><line x1="23" y1="16" x2="29" y2="16" stroke="currentColor" stroke-width="1.5"/></svg>
+      </span>
+      <span class="logo__text">AI<em>Checked</em></span>
+    </a>
+    <nav class="header__nav">
+      <a href="/">Home</a>
+      <a href="/#humanizer-prompt">Humaniser prompt</a>
+    </nav>
+  </header>
+
+  <main class="main legal">
+    <article class="legal__card">
+      <p class="legal__eyebrow">Blog</p>
+      <h1 class="legal__title">Could AIChecked go deeper?</h1>
+      <p class="legal__updated">25 June 2026</p>
+
+      <p class="legal__lead">You've probably noticed the trade-off already. AIChecked is fast, private, and free because the scan runs in your browser. It also misses plenty of polished AI writing. We're weighing what a stronger check could look like without turning this into another upload-and-wait site.</p>
+
+      <h2>What you get today</h2>
+      <p>Paste your text, hit Scan, and we flag surface patterns common in ChatGPT, Claude, and similar tools. Buzzwords. Essay-style transitions. Lines that read unnaturally plain or simple. Long dashes used like seasoning. The usual tells.</p>
+      <p>Your words stay on your device. No account. No queue. You're not waiting on a remote server while a spinner pretends to think. For a quick read on an essay or email before you send it, that's the whole point.</p>
+      <p>None of this is proof. A careful human edit can still trip a flag. Formal human prose can too. Polished AI often scores low. We say that upfront because pretending otherwise would be worse.</p>
+
+      <h2>What we're considering</h2>
+      <p>Nothing here is promised. It's the direction we're exploring if we add a deeper layer later.</p>
+
+      <h3>A second pass that thinks like a language model</h3>
+      <p>Surface patterns catch style. A deeper pass would ask whether the wording looks statistically too easy for a machine to predict.</p>
+      <p>Research methods like <a href="https://arxiv.org/abs/2401.12070" rel="noopener noreferrer">Binoculars</a> compare two open language models on the same text. When both models find the wording very predictable, that's a signal the text might be machine-written. Still not a verdict.</p>
+      <p>That kind of check needs more computing than a browser tab can reasonably offer every visitor.</p>
+
+      <h3>Showing you which sentences matter</h3>
+      <p>Right now you get one score for the whole paste. A richer report might highlight the lines that pushed it up. A buzzword cluster in one paragraph. A run of overly plain sentences in another. One section that looks statistically odd compared with the rest.</p>
+      <p>If you're editing a draft, that's more useful than staring at a single percentage.</p>
+
+      <h3>Combining both layers</h3>
+      <p>Style tells and statistical tells fail in different ways. A blended score, with plain notes on each part, would likely behave better on short pieces than either method on its own.</p>
+
+      <h3>An optional deep scan you choose</h3>
+      <p>We probably won't make server-side analysis the default. If we offer it, you'd opt in. You'd see a clear notice that the text will be processed on our systems. We score it, then discard it. No silent uploads.</p>
+      <p>It would be slower. Think seconds, not instant. It still wouldn't be courtroom-grade evidence.</p>
+
+      <h2>Why it's not live yet</h2>
+      <p>A few tensions are holding it back.</p>
+      <p><strong>Privacy.</strong> The current scanner works because nothing is sent anywhere. A deep scan breaks that unless you're told and you agree.</p>
+      <p><strong>Cost and abuse.</strong> Running language models for anonymous web traffic gets expensive fast. We'd need sensible limits so the tool stays free for normal use.</p>
+      <p><strong>Honesty.</strong> Even a deep scan won't catch every humanised draft. We'd rather ship something slower and label it uncertain than pretend we've solved detection.</p>
+
+      <h2>Credit where it's due</h2>
+      <p>The live site scan is our own heuristic layer. Statistical methods we're exploring build on published work others can read and verify.</p>
+      <ul>
+        <li><a href="https://arxiv.org/abs/2401.12070" rel="noopener noreferrer">Binoculars: zero-shot detection of machine-generated text</a> (Hans et al., ICML 2024). We implement the scoring approach from this paper in our research repo; we don't ship their source code on the public site.</li>
+        <li><a href="https://arxiv.org/abs/2301.11305" rel="noopener noreferrer">DetectGPT: zero-shot detection using probability curvature</a> (Mitchell et al., ICML 2023). Cited as prior work that motivates the statistical angle.</li>
+        <li><a href="https://huggingface.co/openai-community/gpt2" rel="noopener noreferrer">GPT-2 and GPT-2-medium</a> (OpenAI, <a href="https://github.com/openai/gpt-2/blob/master/LICENSE" rel="noopener noreferrer">modified MIT licence</a>). Open weights used in self-hosted experiments, loaded via Hugging Face Transformers (Apache-2.0).</li>
+      </ul>
+
+      <h2>Open models and your data</h2>
+      <p>Any deeper layer we build would rely on open-weight language models we can run ourselves. GPT-2 class models released under permissive licences are the sort of thing we mean. Not proprietary APIs that read your text under someone else's terms.</p>
+      <p>We've checked the licensing basics for the research stack behind AIChecked. The models we experiment with are published for reuse with attribution. The detection maths comes from the papers listed under Credit where it's due above.</p>
+      <p>We don't use ChatGPT, Claude, or Gemini weights to score your paste. If a future deep scan ever sends text off your device, we'll say so in the privacy policy first.</p>
+
+      <h2>When paid tools may suit you better</h2>
+      <p>AIChecked is meant to stay small. Free and instant, and it stays private. Paid detectors invest in server-side models, integrations, and support teams. For some jobs, paying makes sense.</p>
+
+      <h3><a href="https://gptzero.me/" rel="noopener noreferrer">GPTZero</a></h3>
+      <p>GPTZero targets schools, editors, and anyone who wants upload-based scanning with sentence-level highlighting. Paid tiers add plagiarism checks, citations, and related authenticity tools.</p>
+      <p>In June 2026, <a href="https://techcrunch.com/2026/06/23/superhuman-acquires-ai-detection-startup-gptzero/" rel="noopener noreferrer">Superhuman agreed to acquire GPTZero</a>. Superhuman is the productivity company that rebranded from Grammarly in late 2025. GPTZero is expected to fold into Superhuman Go alongside Grammarly's own AI detection. If you already write inside that ecosystem, a bundled detector beats opening another tab.</p>
+      <p><strong>When GPTZero fits:</strong> you need LMS or classroom workflows, batch uploads, or a vendor-backed report for a formal review.</p>
+
+      <h3><a href="https://www.grammarly.com/" rel="noopener noreferrer">Grammarly</a> / <a href="https://superhuman.com/" rel="noopener noreferrer">Superhuman</a></h3>
+      <p>Grammarly now sits under the Superhuman umbrella. Many plans include AI writing help and built-in AI detection. One subscription to write with AI and check whether the result still reads as AI.</p>
+      <p><strong>When Grammarly fits:</strong> you're already paying for writing assistance and want detection in the same editor instead of a separate paste box.</p>
+
+      <h3><a href="https://www.turnitin.com/" rel="noopener noreferrer">Turnitin</a></h3>
+      <p>Turnitin is still the institutional default at plenty of universities. Similarity checking plus AI writing scores, wired into assignment submission flows.</p>
+      <p><strong>When Turnitin fits:</strong> your institution mandates it, or you need an audit trail tied to a course or faculty policy. Individuals rarely pick it for casual use.</p>
+
+      <h3><a href="https://originality.ai/" rel="noopener noreferrer">Originality.ai</a></h3>
+      <p>Originality.ai aims at publishers, agencies, and SEO teams. AI detection plus plagiarism, with team billing and site-scan features on many plans.</p>
+      <p><strong>When Originality.ai fits:</strong> you're checking client or web content at volume and want invoices, seats, and a dashboard.</p>
+
+      <h3><a href="https://copyleaks.com/" rel="noopener noreferrer">Copyleaks</a></h3>
+      <p>Copyleaks sells AI and plagiarism detection to enterprises and education, with API access and compliance-oriented packaging.</p>
+      <p><strong>When Copyleaks fits:</strong> you need API integration into your own product or a formal enterprise contract.</p>
+
+      <h3>Where AIChecked still fits</h3>
+      <p>Reach for AIChecked when you want a fast check on a draft you're not ready to upload anywhere. Try the <a href="/#humanizer-prompt">humaniser prompt</a> before you write. Scan here before you submit. Move to a paid tool if the stakes justify a second opinion.</p>
+      <p>Free browser heuristics won't replace Turnitin in a disciplinary hearing. They might help you or a student ask a sharper question before spending money or handing text to a third party.</p>
+
+      <h2>Where that leaves you</h2>
+      <p>For now, keep using the free browser scan for quick, private checks. The <a href="/#humanizer-prompt">humaniser prompt</a> helps if you're steering a draft away from obvious AI tells.</p>
+      <p>If we add a deeper option later, it'll be because it helps you understand a result. Not because we want to hoard your essays. Until then, treat every score as a hint and read the text yourself.</p>
+
+      <p class="legal__disclaimer">AIChecked is a research tool. Scores are signals, not proof. See our <a href="/terms.html">terms</a> and <a href="/privacy.html">privacy policy</a> for how the site works today.</p>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <nav class="footer__links" aria-label="Legal">
+      <a href="/blog/deeper-analysis.html" aria-current="page">Blog</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+    </nav>
+    <p><strong>AIChecked.com</strong>, research tool, not a courtroom.</p>
+    <p class="footer__fine"><a href="/">Back to scanner</a></p>
+  </footer>
+</body>
+</html>
