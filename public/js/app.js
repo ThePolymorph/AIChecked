@@ -1,11 +1,17 @@
-import { quickCheck } from "./heuristics.js?v=7";
+import { quickCheck } from "./heuristics.js?v=8";
 
 const $ = (sel) => document.querySelector(sel);
 
+const MAX_WORDS = 5000;
+
 const inputText = $("#inputText");
+const textareaWrap = $("#textareaWrap");
 const wordCount = $("#wordCount");
 const btnQuick = $("#btnQuick");
 const btnClear = $("#btnClear");
+const btnCopyPrompt = $("#btnCopyPrompt");
+const copyPromptFeedback = $("#copyPromptFeedback");
+const humanizerPromptEl = $("#humanizerPromptText");
 const scanLine = $("#scanLine");
 const results = $("#results");
 const emptyState = $("#emptyState");
@@ -25,12 +31,28 @@ const disclaimer = $("#disclaimer");
 
 const GAUGE_ARC = 251.2;
 
+/** Plain-text version of the humanizer prompt for clipboard */
+const HUMANIZER_PROMPT_PLAIN = `Write in a natural human voice. Follow every rule:
+
+- Use contractions where a real person would (don't, can't, it's).
+- Vary sentence length. Mix short lines with longer ones.
+- No parallel lists of three (avoid "fast, reliable, and scalable").
+- Skip AI buzzwords: delve, landscape, crucial, seamless, foster, leverage, pivotal, tapestry, multifaceted, palpable.
+- No essay transitions: furthermore, moreover, in conclusion, it's important to note.
+- Limit em dashes. Prefer commas or a new sentence.
+- Avoid participial tag-ons (, watching the tide, , feeling the weight).
+- Avoid filler like "the way she", "as if", and "something about".
+- No throat-clearing openers (In today's world, Throughout history).
+- Write plainly. Slightly imperfect beats over-polished.
+
+When done, check the draft at AIChecked.com before you submit.`;
+
 const VERDICT_COPY = {
-  likely_human: "Some surface patterns lean human — still not proof, especially on short or literary text.",
-  uncertain: "Mixed or weak signals — could be human, could be polished AI (Claude, GPT-4). Read critically.",
+  likely_human: "Some surface patterns lean human. Still not proof, especially on short or literary text.",
+  uncertain: "Mixed or weak signals. Could be human, could be polished AI (Claude, GPT-4). Read critically.",
   uncertain_low:
-    "Very few patterns detected — polished AI often scores this low. Not enough signal to call it human.",
-  likely_ai: "Multiple AI surface patterns detected. Still not proof — use judgment.",
+    "Very few patterns detected. Polished AI often scores this low. Not enough signal to call it human.",
+  likely_ai: "Multiple AI surface patterns detected. Still not proof. Use judgment.",
 };
 
 function countWords(text) {
@@ -38,16 +60,47 @@ function countWords(text) {
   return m ? m.length : 0;
 }
 
+function truncateToMaxWords(text, maxWords) {
+  const re = /\b\w+(?:'\w+)?\b/g;
+  let match;
+  let count = 0;
+  let cutAt = text.length;
+  while ((match = re.exec(text)) !== null) {
+    count += 1;
+    if (count === maxWords) cutAt = re.lastIndex;
+    if (count > maxWords) break;
+  }
+  if (count <= maxWords) return text;
+  return text.slice(0, cutAt).trimEnd();
+}
+
 function updateWordCount() {
   const n = countWords(inputText.value);
-  wordCount.textContent = `${n} word${n === 1 ? "" : "s"}`;
-  wordCount.style.color = n > 0 && n < 100 ? "var(--amber)" : "";
+  const atLimit = n >= MAX_WORDS;
+  const shortWarn = n > 0 && n < 100;
+
+  wordCount.textContent = `${n.toLocaleString()} / ${MAX_WORDS.toLocaleString()} words`;
+  wordCount.classList.toggle("word-count--limit", atLimit);
+  wordCount.classList.toggle("word-count--warn", shortWarn && !atLimit);
+
+  textareaWrap?.classList.toggle("textarea-wrap--at-limit", atLimit);
+  btnQuick.disabled = n === 0;
+}
+
+function enforceWordLimit() {
+  const truncated = truncateToMaxWords(inputText.value, MAX_WORDS);
+  if (truncated !== inputText.value) {
+    inputText.value = truncated;
+    scanHint.textContent = `Limited to ${MAX_WORDS.toLocaleString()} words for in-browser scanning.`;
+    scanHint.style.color = "var(--amber)";
+  }
+  updateWordCount();
 }
 
 function setScanning(on) {
   scanner.classList.toggle("is-scanning", on);
   scanLine.classList.toggle("active", on);
-  btnQuick.disabled = on;
+  btnQuick.disabled = on || countWords(inputText.value) === 0;
 }
 
 function gaugeColor(pct) {
@@ -143,10 +196,22 @@ function renderReport(report) {
   if (deepCard) deepCard.hidden = true;
 }
 
+function trackEvent(name, params = {}) {
+  if (typeof gtag === "function") {
+    gtag("event", name, { event_category: "engagement", ...params });
+  }
+}
+
 function runQuickScan() {
   const text = inputText.value.trim();
   if (!text) {
     scanHint.textContent = "Paste some text first.";
+    scanHint.style.color = "var(--coral)";
+    return;
+  }
+  const wc = countWords(text);
+  if (wc > MAX_WORDS) {
+    scanHint.textContent = `Text exceeds ${MAX_WORDS.toLocaleString()} words.`;
     scanHint.style.color = "var(--coral)";
     return;
   }
@@ -157,12 +222,7 @@ function runQuickScan() {
     try {
       renderReport(quickCheck(text));
       scanHint.textContent = "Done. Text never left your device.";
-      if (typeof gtag === "function") {
-        gtag("event", "scan_complete", {
-          word_count: countWords(text),
-          event_category: "engagement",
-        });
-      }
+      trackEvent("scan_complete", { word_count: wc });
     } catch (err) {
       scanHint.textContent = err.message || "Scan failed.";
       scanHint.style.color = "var(--coral)";
@@ -172,18 +232,39 @@ function runQuickScan() {
   });
 }
 
+async function copyHumanizerPrompt() {
+  try {
+    await navigator.clipboard.writeText(HUMANIZER_PROMPT_PLAIN);
+    copyPromptFeedback.hidden = false;
+    copyPromptFeedback.textContent = "Copied!";
+    trackEvent("copy_humanizer_prompt", { prompt_name: "surface_humanizer_v1" });
+    setTimeout(() => {
+      copyPromptFeedback.hidden = true;
+    }, 2500);
+  } catch {
+    copyPromptFeedback.hidden = false;
+    copyPromptFeedback.textContent = "Select the quote and copy manually.";
+    trackEvent("copy_humanizer_prompt_failed");
+  }
+}
+
 btnQuick.addEventListener("click", runQuickScan);
+btnCopyPrompt?.addEventListener("click", copyHumanizerPrompt);
 
 btnClear.addEventListener("click", () => {
   inputText.value = "";
   updateWordCount();
   results.hidden = true;
   emptyState.hidden = false;
-  scanHint.textContent = "Runs in your browser — instant and private. Surface patterns only; polished AI may slip through.";
+  scanHint.textContent = "Runs in your browser. Instant and private. Surface patterns only; polished AI may slip through.";
   scanHint.style.color = "";
 });
 
-inputText.addEventListener("input", updateWordCount);
+inputText.addEventListener("input", enforceWordLimit);
+
+inputText.addEventListener("paste", () => {
+  requestAnimationFrame(enforceWordLimit);
+});
 
 const svg = document.querySelector(".gauge__svg");
 if (svg && !svg.querySelector("defs")) {

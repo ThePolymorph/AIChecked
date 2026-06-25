@@ -77,6 +77,7 @@
     </a>
     <nav class="header__nav">
       <a href="#how">How it works</a>
+      <a href="#humanizer-prompt">Humanizer prompt</a>
     </nav>
   </header>
 
@@ -91,10 +92,10 @@
       <div class="scanner__panel">
         <div class="scanner__toolbar">
           <span class="scanner__label">Input</span>
-          <span class="word-count" id="wordCount">0 words</span>
+          <span class="word-count" id="wordCount">0 / 5,000 words</span>
         </div>
-        <div class="textarea-wrap">
-          <textarea id="inputText" placeholder="Paste an essay, email, article, or paragraph here…" spellcheck="true"></textarea>
+        <div class="textarea-wrap" id="textareaWrap">
+          <textarea id="inputText" maxlength="400000" placeholder="Paste an essay, email, article, or paragraph here (max 5,000 words)…" spellcheck="true" aria-describedby="wordCount scanHint"></textarea>
           <div class="scan-line" id="scanLine" aria-hidden="true"></div>
         </div>
         <div class="scanner__actions">
@@ -182,6 +183,39 @@
       </div>
     </section>
 
+    <section class="prompt-section" id="humanizer-prompt">
+      <div class="prompt-section__inner">
+        <h2>LLM humanizer prompt</h2>
+        <p class="prompt-section__lead">
+          Paste this into ChatGPT, Claude, or Gemini <strong>before</strong> you ask it to write or rewrite.
+          It targets the same surface patterns AIChecked scans for. Not foolproof, but it helps drafts read more human.
+        </p>
+        <blockquote class="prompt-quote" id="humanizerPromptText">
+          <p>Write in a natural human voice. Follow every rule:</p>
+          <ul>
+            <li>Use contractions where a real person would (don't, can't, it's).</li>
+            <li>Vary sentence length. Mix short lines with longer ones.</li>
+            <li>No parallel lists of three (avoid "fast, reliable, and scalable").</li>
+            <li>Skip AI buzzwords: delve, landscape, crucial, seamless, foster, leverage, pivotal, tapestry, multifaceted, palpable.</li>
+            <li>No essay transitions: furthermore, moreover, in conclusion, it's important to note.</li>
+            <li>Limit em dashes. Prefer commas or a new sentence.</li>
+            <li>Avoid participial tag-ons (, watching the tide, , feeling the weight).</li>
+            <li>Avoid filler like "the way she", "as if", and "something about".</li>
+            <li>No throat-clearing openers (In today's world, Throughout history).</li>
+            <li>Write plainly. Slightly imperfect beats over-polished.</li>
+          </ul>
+          <p>When done, check the draft at <strong>AIChecked.com</strong> before you submit.</p>
+        </blockquote>
+        <div class="prompt-section__actions">
+          <button type="button" class="btn btn--primary" id="btnCopyPrompt">
+            <span class="btn__icon">📋</span> Copy prompt
+          </button>
+          <span class="prompt-copy-feedback" id="copyPromptFeedback" hidden>Copied!</span>
+        </div>
+        <p class="prompt-section__fine">Share this page if it helps. We track copy clicks anonymously via Google Analytics.</p>
+      </div>
+    </section>
+
     <section class="seo" id="about" aria-label="About AIChecked">
       <h2>Free AI writing checker</h2>
       <p>
@@ -202,6 +236,6 @@
     <p class="footer__fine">Inspired by Binoculars (Hans et al., 2024) and DetectGPT (Mitchell et al., 2023). Runs locally with open-source models.</p>
   </footer>
 
-  <script src="/js/app.js?v=7" type="module"></script>
+  <script src="/js/app.js?v=8" type="module"></script>
 </body>
 </html>
