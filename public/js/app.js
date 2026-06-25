@@ -1,4 +1,4 @@
-import { quickCheck } from "./heuristics.js?v=8";
+import { quickCheck } from "./heuristics.js?v=9";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -16,6 +16,12 @@ const results = $("#results");
 const emptyState = $("#emptyState");
 const scanner = $("#scanner");
 const scanHint = $("#scanHint");
+
+const shareFeedback = $("#shareFeedback");
+
+const SHARE_PAGE_URL = "https://aichecked.com/#scanner";
+const SHARE_TEXT =
+  "Free AI text checker. Paste writing and scan for ChatGPT and Claude patterns in your browser. Private, no upload.";
 
 const aiPct = $("#aiPct");
 const gaugeFill = $("#gaugeFill");
