@@ -62,7 +62,7 @@ const SIGNAL_LABELS = {
   literary_phrasing: "Literary LLM phrasing",
   low_contractions: "Formal / no contractions",
   participial_chains: "Participial chains",
-  artificial_simplicity: "Artificial simplicity",
+  chatty_uniformity: "Unnaturally plain/simple",
 };
 
 const SIGNAL_TOOLTIPS = {
@@ -90,8 +90,8 @@ const SIGNAL_TOOLTIPS = {
     "Very few informal contractions (don't, can't, it's) in longer text. LLMs often write more formally.",
   participial_chains:
     "Trailing phrases like , watching the tide or , feeling the air. Common in literary AI prose.",
-  artificial_simplicity:
-    "Too many short declarative lines, adverb-led openers, or compound sentences starting with And/But/So. Common in humanised AI drafts.",
+  chatty_uniformity:
+    "Too many short declarative lines, adverb-led openers, or compound sentences starting with And/But/So. Writing that sounds unnaturally plain or simple.",
 };
 
 const CONTRACTIONS =
@@ -127,7 +127,7 @@ function isSimpleDeclarative(sentence) {
   return false;
 }
 
-function analyzeArtificialSimplicity(text) {
+function analyzeChattyUniformity(text) {
   const sentences = splitSentences(text);
   const n = sentences.length;
   if (n < 3) {
@@ -368,7 +368,7 @@ export function quickCheck(text) {
     detail: `${rhetQ} question mark(s)`,
   });
 
-  const chatty = analyzeArtificialSimplicity(text);
+  const chatty = analyzeChattyUniformity(text);
   const chattyTriggered =
     (chatty.simpleRatio >= 0.55 && chatty.sentences >= 6) ||
     (chatty.simple >= 5 && chatty.simpleRatio >= 0.45) ||
@@ -379,8 +379,8 @@ export function quickCheck(text) {
   if (chatty.adverbOpen) parts.push(`${chatty.adverbOpen} adverb opener(s)`);
   if (chatty.conjOpen) parts.push(`${chatty.conjOpen} conjunction opener(s)`);
   signals.push({
-    id: "artificial_simplicity",
-    label: SIGNAL_LABELS.artificial_simplicity,
+    id: "chatty_uniformity",
+    label: SIGNAL_LABELS.chatty_uniformity,
     count: chatty.simple,
     weight: 14,
     triggered: chattyTriggered,

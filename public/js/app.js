@@ -1,4 +1,4 @@
-import { quickCheck } from "./heuristics.js?v=13";
+import { quickCheck } from "./heuristics.js?v=15";
 
 const $ = (sel) => document.querySelector(sel);
 
