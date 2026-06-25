@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AIChecked — AI Writing Scanner</title>
+  <meta name="description" content="Instant AI text checker. Surface-pattern scan plus optional deep Binoculars statistical analysis. Free, local, no API keys." />
+  <meta property="og:title" content="AIChecked — AI Writing Scanner" />
+  <meta property="og:description" content="Check text for AI writing patterns and statistical signals." />
+  <meta property="og:url" content="https://aichecked.com" />
+  <meta name="theme-color" content="#060a12" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--a" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--b" aria-hidden="true"></div>
+
+  <header class="header">
+    <a class="logo" href="/">
+      <span class="logo__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" stroke="currentColor" stroke-width="1.5"/><circle cx="16" cy="16" r="4" fill="currentColor"/><line x1="16" y1="3" x2="16" y2="9" stroke="currentColor" stroke-width="1.5"/><line x1="16" y1="23" x2="16" y2="29" stroke="currentColor" stroke-width="1.5"/><line x1="3" y1="16" x2="9" y2="16" stroke="currentColor" stroke-width="1.5"/><line x1="23" y1="16" x2="29" y2="16" stroke="currentColor" stroke-width="1.5"/></svg>
+      </span>
+      <span class="logo__text">AI<em>Checked</em></span>
+    </a>
+    <nav class="header__nav">
+      <a href="#how">How it works</a>
+      <a href="https://github.com" id="githubLink" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section class="hero">
+      <p class="hero__eyebrow">Training-free detection</p>
+      <h1 class="hero__title">Scan writing for<br /><span class="gradient-text">AI fingerprints</span></h1>
+      <p class="hero__sub">Instant surface-pattern check. Optional deep scan with open-source Binoculars cross-perplexity. No API keys. Signals, not proof.</p>
+    </section>
+
+    <section class="scanner" id="scanner">
+      <div class="scanner__panel">
+        <div class="scanner__toolbar">
+          <span class="scanner__label">Input</span>
+          <span class="word-count" id="wordCount">0 words</span>
+        </div>
+        <div class="textarea-wrap">
+          <textarea id="inputText" placeholder="Paste an essay, email, article, or paragraph here…" spellcheck="true"></textarea>
+          <div class="scan-line" id="scanLine" aria-hidden="true"></div>
+        </div>
+        <div class="scanner__actions">
+          <button type="button" class="btn btn--primary" id="btnQuick">
+            <span class="btn__icon">⚡</span> Quick scan
+          </button>
+          <button type="button" class="btn btn--secondary" id="btnDeep">
+            <span class="btn__icon">🔬</span> Deep scan
+          </button>
+          <button type="button" class="btn btn--ghost" id="btnClear">Clear</button>
+        </div>
+        <p class="scanner__hint" id="scanHint">Quick scan is instant. Deep scan loads local GPT-2 models (~1.5 GB) and may take 10–30s on CPU.</p>
+      </div>
+
+      <div class="results" id="results" hidden>
+        <div class="gauge-card">
+          <div class="gauge" id="gauge" data-pct="0">
+            <svg viewBox="0 0 200 120" class="gauge__svg">
+              <path class="gauge__track" d="M 20 100 A 80 80 0 0 1 180 100" />
+              <path class="gauge__fill" id="gaugeFill" d="M 20 100 A 80 80 0 0 1 180 100" />
+            </svg>
+            <div class="gauge__center">
+              <span class="gauge__pct" id="aiPct">—</span>
+              <span class="gauge__label">AI likelihood</span>
+            </div>
+          </div>
+          <div class="verdict" id="verdict">
+            <span class="verdict__badge" id="verdictBadge">—</span>
+            <p class="verdict__copy" id="verdictCopy">Run a scan to see results.</p>
+          </div>
+          <div class="meta-row">
+            <div class="meta-pill"><span>Mode</span> <strong id="scanMode">—</strong></div>
+            <div class="meta-pill"><span>Surface</span> <strong id="surfaceScore">—</strong></div>
+            <div class="meta-pill"><span>Confidence</span> <strong id="confidence">—</strong></div>
+          </div>
+        </div>
+
+        <div class="deep-card" id="deepCard" hidden>
+          <h3>Deep statistical layer</h3>
+          <div class="deep-grid">
+            <div class="deep-stat">
+              <span class="deep-stat__label">Binoculars</span>
+              <span class="deep-stat__value" id="binoculars">—</span>
+              <span class="deep-stat__tag" id="binoLabel">—</span>
+            </div>
+            <div class="deep-stat">
+              <span class="deep-stat__label">Log perplexity</span>
+              <span class="deep-stat__value" id="logPpl">—</span>
+              <span class="deep-stat__tag" id="pplLabel">—</span>
+            </div>
+          </div>
+          <p class="deep-warning" id="deepWarning" hidden></p>
+        </div>
+
+        <div class="signals-card">
+          <h3>Surface signals</h3>
+          <div class="signals" id="signals"></div>
+        </div>
+
+        <p class="disclaimer" id="disclaimer"></p>
+      </div>
+
+      <div class="empty-state" id="emptyState">
+        <div class="empty-state__icon" aria-hidden="true">◎</div>
+        <p>Paste text and hit <strong>Quick scan</strong> for em dashes, rule-of-three, buzzwords, and more.</p>
+      </div>
+    </section>
+
+    <section class="how" id="how">
+      <h2>Two layers, one report</h2>
+      <div class="how__grid">
+        <article class="how__card">
+          <span class="how__num">01</span>
+          <h3>Surface scan</h3>
+          <p>Milliseconds. Flags em dashes, rhetorical triplets, ChatGPT-era buzzwords, essay transitions, and overly uniform sentence rhythm.</p>
+        </article>
+        <article class="how__card">
+          <span class="how__num">02</span>
+          <h3>Deep scan</h3>
+          <p>Binoculars cross-perplexity (Hans et al., 2024) with GPT-2 observer + performer. Harder to fool than pattern matching alone.</p>
+        </article>
+        <article class="how__card">
+          <span class="how__num">03</span>
+          <h3>Combined verdict</h3>
+          <p>Weighted merge when both run. Always treat output as a signal — short text and polished human writing can false-flag.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p><strong>AIChecked.com</strong> — research tool, not a courtroom.</p>
+    <p class="footer__fine">Inspired by Binoculars (Hans et al., 2024) and DetectGPT (Mitchell et al., 2023). Runs locally with open-source models.</p>
+  </footer>
+
+  <script src="/js/app.js" type="module"></script>
+</body>
+</html>

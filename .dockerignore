@@ -1,0 +1,10 @@
+__pycache__
+*.pyc
+.venv
+venv
+.git
+results.csv
+results_detail.csv
+*.pt
+.cache
+.huggingface

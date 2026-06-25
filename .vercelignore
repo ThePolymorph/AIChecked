@@ -1,0 +1,14 @@
+requirements-research.txt
+Dockerfile
+Dockerfile.web
+models.py
+scoring.py
+dataset.py
+evaluate.py
+main.py
+quick_app.py
+results.csv
+results_detail.csv
+__pycache__
+.venv
+*.pt
