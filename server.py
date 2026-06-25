@@ -92,8 +92,7 @@ class ScanResponse(BaseModel):
     report: dict
 
 
-@app.get("/api/health")
-def health():
+def health_payload() -> dict:
     return {
         "status": "ok",
         "quick_only": QUICK_ONLY,
@@ -106,8 +105,7 @@ def health():
     }
 
 
-@app.post("/api/scan", response_model=ScanResponse)
-def scan(req: ScanRequest):
+def perform_scan(req: ScanRequest) -> ScanResponse:
     text = req.text.strip()
     if not text:
         raise HTTPException(400, "Text is empty.")
@@ -133,6 +131,16 @@ def scan(req: ScanRequest):
 
     report: CombinedReport = run_combined_scan(text, pair=pair, mode=req.mode)
     return ScanResponse(report=report.to_dict())
+
+
+@app.get("/api/health")
+def health():
+    return health_payload()
+
+
+@app.post("/api/scan", response_model=ScanResponse)
+def scan(req: ScanRequest):
+    return perform_scan(req)
 
 
 # Local dev: serve static site from public/. On Vercel, public/ is served automatically.

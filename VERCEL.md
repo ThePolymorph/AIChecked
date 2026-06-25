@@ -63,7 +63,8 @@ Vercel dashboard → **Project → Settings → Domains**:
 ## 4. What gets deployed
 
 - `public/` → static site (HTML/CSS/JS)
-- `api/index.py` → serverless `/api/health` and `/api/scan`
+- `api/health.py` → serverless `/api/health`
+- `api/scan.py` → serverless `/api/scan`
 - **Quick scan only** on Vercel (no PyTorch — too large for serverless)
 
 Research tools (`main.py --evaluate`, deep scan) stay in the repo for **local** use:

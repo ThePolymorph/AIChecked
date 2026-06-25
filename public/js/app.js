@@ -144,6 +144,19 @@ function renderReport(report) {
   }
 }
 
+async function parseJsonResponse(res) {
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(
+      text.startsWith("<") || text.startsWith("The page")
+        ? "API route not found — redeploy may still be in progress, or check Vercel function logs."
+        : text.slice(0, 120) || "Invalid server response"
+    );
+  }
+}
+
 async function runScan(mode) {
   const text = inputText.value.trim();
   if (!text) {
@@ -165,7 +178,7 @@ async function runScan(mode) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, mode: mode === "deep" ? "full" : "quick" }),
     });
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     if (!res.ok) {
       const d = data.detail;
       const msg = Array.isArray(d) ? d.map((x) => x.msg || x).join("; ") : d;
@@ -216,7 +229,7 @@ updateWordCount();
 async function initSiteMode() {
   try {
     const res = await fetch("/api/health");
-    const data = await res.json();
+    const data = await parseJsonResponse(res);
     if (data.quick_only) {
       btnDeep.hidden = true;
       scanHint.textContent =

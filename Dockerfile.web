@@ -6,7 +6,7 @@ COPY requirements-web.txt .
 RUN pip install --no-cache-dir -r requirements-web.txt
 
 COPY server.py report.py heuristics.py ./
-COPY api/index.py ./api/
+COPY api/health.py api/scan.py ./api/
 COPY public/ ./public/
 
 ENV QUICK_ONLY=1
