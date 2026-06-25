@@ -1,4 +1,4 @@
-import { quickCheck } from "./heuristics.js?v=9";
+import { quickCheck } from "./heuristics.js?v=10";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -19,9 +19,9 @@ const scanHint = $("#scanHint");
 
 const shareFeedback = $("#shareFeedback");
 
-const SHARE_PAGE_URL = "https://aichecked.com/#scanner";
+const SHARE_PAGE_URL = "https://aichecked.com/#humanizer-prompt";
 const SHARE_TEXT =
-  "Free AI text checker. Paste writing and scan for ChatGPT and Claude patterns in your browser. Private, no upload.";
+  "Free LLM humaniser prompt — paste into ChatGPT or Claude before you write. Helps drafts read more human. Then check at AIChecked.com.";
 
 const aiPct = $("#aiPct");
 const gaugeFill = $("#gaugeFill");
@@ -57,7 +57,7 @@ const VERDICT_COPY = {
   uncertain: "Mixed or weak signals. Could be human, could be polished AI (Claude, GPT-4). Read critically.",
   uncertain_low:
     "Very few patterns detected. Polished AI often scores this low. Not enough signal to call it human.",
-  likely_ai: "Multiple AI surface patterns detected. Still not proof. Use judgment.",
+  likely_ai: "Multiple AI surface patterns detected. Still not proof. Use judgement.",
 };
 
 function countWords(text) {
@@ -253,6 +253,56 @@ async function copyHumanizerPrompt() {
   }
 }
 
+function showShareFeedback(msg) {
+  if (!shareFeedback) return;
+  shareFeedback.textContent = msg;
+  shareFeedback.hidden = false;
+  setTimeout(() => {
+    shareFeedback.hidden = true;
+  }, 2500);
+}
+
+function initShareLinks() {
+  const encUrl = encodeURIComponent(SHARE_PAGE_URL);
+  const encText = encodeURIComponent(SHARE_TEXT);
+
+  const facebook = $("#shareFacebook");
+  const x = $("#shareX");
+  const linkedin = $("#shareLinkedIn");
+  const whatsapp = $("#shareWhatsApp");
+  const instagram = $("#shareInstagram");
+
+  if (facebook) {
+    facebook.href = `https://www.facebook.com/sharer/sharer.php?u=${encUrl}`;
+    facebook.addEventListener("click", () => trackEvent("share_social", { platform: "facebook" }));
+  }
+  if (x) {
+    x.href = `https://twitter.com/intent/tweet?url=${encUrl}&text=${encText}`;
+    x.addEventListener("click", () => trackEvent("share_social", { platform: "x" }));
+  }
+  if (linkedin) {
+    linkedin.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encUrl}`;
+    linkedin.addEventListener("click", () => trackEvent("share_social", { platform: "linkedin" }));
+  }
+  if (whatsapp) {
+    whatsapp.href = `https://wa.me/?text=${encText}%20${encUrl}`;
+    whatsapp.addEventListener("click", () => trackEvent("share_social", { platform: "whatsapp" }));
+  }
+  if (instagram) {
+    instagram.addEventListener("click", async () => {
+      const clip = `${SHARE_TEXT} ${SHARE_PAGE_URL}`;
+      try {
+        await navigator.clipboard.writeText(clip);
+        showShareFeedback("Link copied for Instagram");
+        trackEvent("share_social", { platform: "instagram", method: "copy_link" });
+      } catch {
+        showShareFeedback("Copy the link from your browser bar");
+        trackEvent("share_social", { platform: "instagram", method: "copy_failed" });
+      }
+    });
+  }
+}
+
 btnQuick.addEventListener("click", runQuickScan);
 btnCopyPrompt?.addEventListener("click", copyHumanizerPrompt);
 
@@ -283,3 +333,4 @@ if (svg && !svg.querySelector("defs")) {
 }
 
 updateWordCount();
+initShareLinks();

@@ -373,6 +373,12 @@ textarea::placeholder { color: #5a6a85; }
   font-weight: 500;
 }
 
+.share-row--prompt {
+  margin-top: 1.25rem;
+  padding-top: 0;
+  border-top: none;
+}
+
 
 .empty-state {
   text-align: center;
