@@ -393,8 +393,27 @@ textarea::placeholder { color: #5a6a85; }
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 700;
-  margin: 0 0 1rem;
+  margin: 0 0 0.35rem;
   letter-spacing: -0.02em;
+}
+
+.signals-card__hint {
+  margin: 0 0 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.signals-card__q {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.65rem;
+  font-weight: 700;
+  vertical-align: middle;
 }
 
 .deep-grid {
@@ -466,7 +485,78 @@ textarea::placeholder { color: #5a6a85; }
 .signal__name {
   font-size: 0.85rem;
   font-weight: 600;
+  flex: 1;
+  min-width: 0;
 }
+
+.signal__help {
+  position: relative;
+  flex-shrink: 0;
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  cursor: help;
+  font: inherit;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.signal__help:hover,
+.signal__help:focus-visible {
+  background: var(--accent-dim);
+  color: var(--accent);
+  outline: none;
+}
+
+.signal__help-icon {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.15rem;
+  text-align: center;
+}
+
+.signal__tooltip {
+  position: absolute;
+  z-index: 20;
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 16rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  background: #1a2438;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.45;
+  text-align: left;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s, visibility 0.15s;
+}
+
+.signal__help:hover .signal__tooltip,
+.signal__help:focus-visible .signal__tooltip,
+.signal__help.is-open .signal__tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (hover: none) {
+  .signal__help {
+    cursor: pointer;
+  }
+}
+
 .signal__dot {
   width: 8px;
   height: 8px;

@@ -64,6 +64,33 @@ const SIGNAL_LABELS = {
   participial_chains: "Participial chains",
 };
 
+const SIGNAL_TOOLTIPS = {
+  em_dashes:
+    "Counts long dashes (the — character), en dashes, and double hyphens (--). ChatGPT and Claude often use them more than typical human drafts.",
+  rule_of_three:
+    "Parallel lists of three items, like fast, clear, and compelling. A common rhetorical pattern in LLM writing.",
+  buzzwords:
+    "Words overused in AI-era prose: delve, landscape, crucial, seamless, palpable, and similar.",
+  signpost_phrases:
+    "Essay-style transitions such as furthermore, in conclusion, and it's important to note.",
+  uniform_sentences:
+    "When sentence lengths stay very similar throughout. LLM prose often has a smooth, even rhythm.",
+  list_heavy:
+    "Many numbered or bulleted lines. LLMs frequently produce structured outlines.",
+  generic_opener:
+    "Opens with a broad setup, such as In today's world or Throughout history.",
+  colon_opener:
+    "Clauses that introduce a colon, then explain. Common in explanatory AI text.",
+  rhetorical_questions:
+    "Multiple questions in the passage. Sometimes used for fake engagement in AI drafts.",
+  literary_phrasing:
+    "Phrases like the way, as if, and something about. Frequent in polished Claude-style narrative.",
+  low_contractions:
+    "Very few informal contractions (don't, can't, it's) in longer text. LLMs often write more formally.",
+  participial_chains:
+    "Trailing phrases like , watching the tide or , feeling the air. Common in literary AI prose.",
+};
+
 const CONTRACTIONS =
   /\b(?:don't|won't|can't|it's|that's|there's|I'm|I've|you're|they're|we're|isn't|aren't|wasn't|weren't|doesn't|didn't|haven't|hasn't|couldn't|wouldn't|shouldn't|I'll|we'll|she's|he's)\b/gi;
 
@@ -233,7 +260,7 @@ export function quickCheck(text) {
     weight: 10,
     triggered: lowContr,
     partial: wc >= 80 ? Math.max(0, (0.6 - contrPer100) / 0.6) : 0,
-    detail: `${contractions} contraction(s) (${contrPer100.toFixed(2)} per 100 words — LLM prose often avoids them)`,
+    detail: `${contractions} contraction(s) (${contrPer100.toFixed(2)} per 100 words; LLM prose often avoids them)`,
   });
 
   const listBlocks = (text.match(/(?:^|\n)\s*(?:\d+[.)]|[-*•])\s+\S/gm) || []).length;
@@ -305,10 +332,15 @@ function buildReport(wc, aiPct, signals, surfaceScore, surfaceVerdict) {
     overall_verdict: overall,
     confidence,
     signals: signals.map(({ id, label, triggered, count, detail }) => ({
-      id, label, triggered, count, detail,
+      id,
+      label,
+      triggered,
+      count,
+      detail,
+      tooltip: SIGNAL_TOOLTIPS[id] || "",
     })),
     scan_mode: "quick",
     disclaimer:
-      "Surface-pattern scan only — literary AI (Claude, etc.) often scores low. Not proof. Nothing is uploaded.",
+      "Surface-pattern scan only. Literary AI (Claude, etc.) often scores low. Not proof. Nothing is uploaded.",
   };
 }

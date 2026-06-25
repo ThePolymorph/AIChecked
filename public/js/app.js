@@ -1,4 +1,4 @@
-import { quickCheck } from "./heuristics.js?v=5";
+import { quickCheck } from "./heuristics.js?v=7";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -88,13 +88,37 @@ function renderSignals(signals) {
     <div class="signal ${s.triggered ? "signal--on" : ""}">
       <div class="signal__head">
         <span class="signal__name">${escapeHtml(s.label)}</span>
-        <span class="signal__dot"></span>
+        ${
+          s.tooltip
+            ? `<button type="button" class="signal__help" aria-label="About ${escapeHtml(s.label)}">
+            <span class="signal__help-icon" aria-hidden="true">?</span>
+            <span class="signal__tooltip" role="tooltip">${escapeHtml(s.tooltip)}</span>
+          </button>`
+            : ""
+        }
+        <span class="signal__dot" aria-hidden="true"></span>
       </div>
       <p class="signal__detail">${escapeHtml(s.detail)}</p>
     </div>`
     )
     .join("");
+  bindSignalTooltips();
 }
+
+function bindSignalTooltips() {
+  signalsEl.querySelectorAll(".signal__help").forEach((btn) => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const wasOpen = btn.classList.contains("is-open");
+      signalsEl.querySelectorAll(".signal__help.is-open").forEach((b) => b.classList.remove("is-open"));
+      if (!wasOpen) btn.classList.add("is-open");
+    };
+  });
+}
+
+document.addEventListener("click", () => {
+  signalsEl?.querySelectorAll(".signal__help.is-open").forEach((b) => b.classList.remove("is-open"));
+});
 
 function escapeHtml(s) {
   return String(s)
