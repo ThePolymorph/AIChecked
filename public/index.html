@@ -189,7 +189,7 @@
         <h2>LLM humaniser prompt</h2>
         <p class="prompt-section__lead">
           Paste this into ChatGPT, Claude, or Gemini <strong>before</strong> you ask it to write or rewrite.
-          It targets the same surface patterns AIChecked scans for. Not foolproof, but it helps drafts read more human.
+          It targets surface patterns AIChecked scans for, including the "artificial simplicity" trap: too many short lines opening with Sometimes, And, or But.
         </p>
         <blockquote class="prompt-quote" id="humanizerPromptText">
           <p>Write in a natural human voice. Follow every rule:</p>
@@ -203,7 +203,10 @@
             <li>Avoid participial tag-ons (, watching the tide, , feeling the weight).</li>
             <li>Avoid filler like "the way she", "as if", and "something about".</li>
             <li>No throat-clearing openers (In today's world, Throughout history).</li>
-            <li>Write plainly. Slightly imperfect beats over-polished.</li>
+            <li>Don't stack sentences that all start the same way. Avoid line after line opening with Sometimes, Often, And, But, or So.</li>
+            <li>Drop the reader into a scene with "you" or "I", not only flat observations about "they" or "it".</li>
+            <li>Use specific details (a grey tabby, two seconds, the top of the fridge) instead of tidy generic similes.</li>
+            <li>Plain doesn't mean every line is a short subject-verb sentence. One longer, messier sentence is fine.</li>
           </ul>
           <p>When done, check the draft at <strong>AIChecked.com</strong> before you submit.</p>
         </blockquote>
@@ -263,6 +266,6 @@
     <p class="footer__fine">Inspired by Binoculars (Hans et al., 2024) and DetectGPT (Mitchell et al., 2023). Runs locally with open-source models.</p>
   </footer>
 
-  <script src="/js/app.js?v=10" type="module"></script>
+  <script src="/js/app.js?v=11" type="module"></script>
 </body>
 </html>

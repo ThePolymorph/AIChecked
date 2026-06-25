@@ -62,6 +62,7 @@ const SIGNAL_LABELS = {
   literary_phrasing: "Literary LLM phrasing",
   low_contractions: "Formal / no contractions",
   participial_chains: "Participial chains",
+  artificial_simplicity: "Artificial simplicity",
 };
 
 const SIGNAL_TOOLTIPS = {
@@ -89,10 +90,37 @@ const SIGNAL_TOOLTIPS = {
     "Very few informal contractions (don't, can't, it's) in longer text. LLMs often write more formally.",
   participial_chains:
     "Trailing phrases like , watching the tide or , feeling the air. Common in literary AI prose.",
+  artificial_simplicity:
+    "Many short chatty lines opening with Sometimes, Often, And, But, or So. Humanised drafts often overdo plain subject-verb sentences.",
 };
 
 const CONTRACTIONS =
   /\b(?:don't|won't|can't|it's|that's|there's|I'm|I've|you're|they're|we're|isn't|aren't|wasn't|weren't|doesn't|didn't|haven't|hasn't|couldn't|wouldn't|shouldn't|I'll|we'll|she's|he's)\b/gi;
+
+const CHATTY_STARTERS = /^(?:Sometimes|Often|Usually|Generally|Typically|And|But|So|Then|Also|Maybe|Perhaps|Honestly|Really|Plus)\b/i;
+
+function chattyOpeners(text) {
+  const sentences = text
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (sentences.length < 3) {
+    return { total: 0, sometimes: 0, sentences: sentences.length, ratio: 0 };
+  }
+
+  let total = 0;
+  let sometimes = 0;
+  for (const s of sentences) {
+    if (/^Sometimes\b/i.test(s)) {
+      sometimes += 1;
+      total += 1;
+    } else if (CHATTY_STARTERS.test(s)) {
+      total += 1;
+    }
+  }
+
+  return { total, sometimes, sentences: sentences.length, ratio: total / sentences.length };
+}
 
 function wordCount(text) {
   const m = text.match(/\b\w+(?:'\w+)?\b/g);
@@ -307,6 +335,23 @@ export function quickCheck(text) {
     triggered: rhetQ >= 2 && wc >= 80,
     partial: Math.min(1, rhetQ / 3),
     detail: `${rhetQ} question mark(s)`,
+  });
+
+  const chatty = chattyOpeners(text);
+  const chattyTriggered =
+    chatty.sometimes >= 2 ||
+    (chatty.total >= 3 && chatty.ratio >= 0.2) ||
+    chatty.total >= 4;
+  let chattyDetail = `${chatty.total} chatty opener(s) in ${chatty.sentences} sentence(s)`;
+  if (chatty.sometimes) chattyDetail += ` (${chatty.sometimes}× Sometimes…)`;
+  signals.push({
+    id: "artificial_simplicity",
+    label: SIGNAL_LABELS.artificial_simplicity,
+    count: chatty.total,
+    weight: 12,
+    triggered: chattyTriggered,
+    partial: Math.min(1, chatty.total / 4) * Math.min(1, chatty.ratio / 0.25),
+    detail: chattyDetail,
   });
 
   const maxPts = signals.reduce((a, s) => a + s.weight, 0);
