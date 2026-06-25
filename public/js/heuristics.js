@@ -1,4 +1,4 @@
-/** Browser-side quick scan (mirrors heuristics.py). No server required. */
+/** Browser-side quick scan. Tuned for literary LLM prose (Claude, ChatGPT, etc.). */
 
 const BUZZWORDS = new Set([
   "crucial", "delve", "delves", "delving", "tapestry", "landscape", "testament",
@@ -10,7 +10,19 @@ const BUZZWORDS = new Set([
   "nuanced", "commendable", "noteworthy", "groundbreaking", "cutting-edge",
   "spearhead", "spearheaded", "myriad", "plethora", "interplay",
   "showcase", "showcases", "elevate", "elevates",
+  // Claude / literary LLM register
+  "palpable", "liminal", "etched", "weathered", "gilded", "nested",
+  "unmistakable", "quietly", "gently", "tender", "stillness", "threshold",
+  "particular", "increasingly", "genuine", "resonance", "poignant",
+  "atmospheric", "textured", "luminous", "hushed", "crystalline",
 ]);
+
+const LITERARY_PATTERNS = [
+  { id: "the_way", re: /\bthe way\b/gi, label: "'The way…' phrasing" },
+  { id: "as_if", re: /\bas if\b/gi, label: "'As if' constructions" },
+  { id: "something_about", re: /\bsomething (?:about|in|between)\b/gi, label: "'Something about…'" },
+  { id: "present_participle", re: /,\s+[a-z]+ing\b/gi, label: "Participial phrases (, watching…)" },
+];
 
 const SIGNPOST_PATTERNS = [
   /\bit'?s important to note\b/gi,
@@ -47,7 +59,13 @@ const SIGNAL_LABELS = {
   generic_opener: "Generic opener",
   colon_opener: "Colon explanations",
   rhetorical_questions: "Rhetorical questions",
+  literary_phrasing: "Literary LLM phrasing",
+  low_contractions: "Formal / no contractions",
+  participial_chains: "Participial chains",
 };
+
+const CONTRACTIONS =
+  /\b(?:don't|won't|can't|it's|that's|there's|I'm|I've|you're|they're|we're|isn't|aren't|wasn't|weren't|doesn't|didn't|haven't|hasn't|couldn't|wouldn't|shouldn't|I'll|we'll|she's|he's)\b/gi;
 
 function wordCount(text) {
   const m = text.match(/\b\w+(?:'\w+)?\b/g);
@@ -58,8 +76,7 @@ function countMatches(patterns, text) {
   let n = 0;
   for (const p of patterns) {
     const re = new RegExp(p.source, p.flags);
-    const hits = text.match(re);
-    if (hits) n += hits.length;
+    n += (text.match(re) || []).length;
   }
   return n;
 }
@@ -72,44 +89,63 @@ function countEmDashes(text) {
 
 function buzzwordHits(text) {
   const words = text.toLowerCase().match(/\b[a-z][a-z'-]*\b/g) || [];
-  const found = [...new Set(words.filter((w) => BUZZWORDS.has(w)))].sort();
-  return found;
+  return [...new Set(words.filter((w) => BUZZWORDS.has(w)))].sort();
 }
 
 function sentenceCv(text) {
   const sentences = text.split(/(?<=[.!?])\s+/).filter((s) => s.trim());
   const lengths = sentences.map((s) => s.split(/\s+/).filter(Boolean).length).filter((n) => n > 0);
-  if (lengths.length < 3) return { cv: 0, detail: "too few sentences to measure rhythm" };
+  if (lengths.length < 3) return { cv: 1, n: lengths.length, detail: "too few sentences to measure rhythm" };
   const mean = lengths.reduce((a, b) => a + b, 0) / lengths.length;
   const variance = lengths.reduce((a, l) => a + (l - mean) ** 2, 0) / lengths.length;
   const cv = Math.sqrt(variance) / mean;
-  return { cv, detail: `sentence length CV=${cv.toFixed(2)} (low < 0.35 often feels machine-smooth)` };
+  return {
+    cv,
+    n: lengths.length,
+    detail: `sentence length CV=${cv.toFixed(2)} (low < 0.45 → machine-smooth)`,
+  };
+}
+
+function literaryPhraseHits(text) {
+  let total = 0;
+  const parts = [];
+  for (const { re, label } of LITERARY_PATTERNS) {
+    const n = (text.match(re) || []).length;
+    if (n) parts.push(`${label}: ${n}`);
+    total += n;
+  }
+  return { total, parts };
 }
 
 function overallVerdict(aiPct) {
-  if (aiPct < 30) return ["likely_human", "low"];
-  if (aiPct < 55) return ["uncertain", "medium"];
-  if (aiPct < 75) return ["likely_ai", "medium"];
+  if (aiPct < 28) return ["likely_human", "low"];
+  if (aiPct < 52) return ["uncertain", "medium"];
+  if (aiPct < 72) return ["likely_ai", "medium"];
   return ["likely_ai", "high"];
+}
+
+/** Points = weight if triggered, else weight * partial (0–1) for soft scoring */
+function contribute(weight, triggered, partial = 0) {
+  return triggered ? weight : weight * Math.min(1, Math.max(0, partial)) * 0.55;
 }
 
 export function quickCheck(text) {
   text = text.trim();
   const wc = wordCount(text);
-  if (!wc) {
-    return buildReport(0, "low", [], 0, "low");
-  }
+  if (!wc) return buildReport(0, "low", [], 0, "low");
 
   const signals = [];
 
   const emCount = countEmDashes(text);
   const emPer100 = (emCount / wc) * 100;
+  const emTriggered = emCount >= 1 && emPer100 >= 0.4;
   signals.push({
     id: "em_dashes",
     label: SIGNAL_LABELS.em_dashes,
     count: emCount,
-    weight: 18,
-    triggered: emCount >= 2 && emPer100 >= 1,
+    weight: 16,
+    triggered: emTriggered,
+    partial: Math.min(1, emCount / 2) * Math.min(1, emPer100 / 0.8),
     detail: `${emCount} em/en dash(es) (${emPer100.toFixed(1)} per 100 words)`,
   });
 
@@ -118,46 +154,84 @@ export function quickCheck(text) {
     id: "rule_of_three",
     label: SIGNAL_LABELS.rule_of_three,
     count: tripleCount,
-    weight: 15,
-    triggered: tripleCount >= 2,
-    detail: `${tripleCount} rule-of-three list pattern(s) (e.g. 'X, Y, and Z')`,
+    weight: 14,
+    triggered: tripleCount >= 1,
+    partial: Math.min(1, tripleCount / 2),
+    detail: `${tripleCount} rule-of-three pattern(s) (X, Y, and Z)`,
   });
 
   const buzz = buzzwordHits(text);
-  let buzzDetail = `${buzz.length} AI-era buzzword(s)`;
+  let buzzDetail = `${buzz.length} AI/literary buzzword(s)`;
   if (buzz.length) buzzDetail += `: ${buzz.slice(0, 6).join(", ")}${buzz.length > 6 ? ", …" : ""}`;
   signals.push({
     id: "buzzwords",
     label: SIGNAL_LABELS.buzzwords,
     count: buzz.length,
-    weight: 12,
-    triggered: buzz.length >= 2,
+    weight: 14,
+    triggered: buzz.length >= 1,
+    partial: Math.min(1, buzz.length / 3),
     detail: buzzDetail,
   });
 
   let signpostN = 0;
   for (const p of SIGNPOST_PATTERNS) {
-    const re = new RegExp(p.source, p.flags);
-    signpostN += (text.match(re) || []).length;
+    signpostN += (text.match(new RegExp(p.source, p.flags)) || []).length;
   }
   signals.push({
     id: "signpost_phrases",
     label: SIGNAL_LABELS.signpost_phrases,
     count: signpostN,
-    weight: 14,
-    triggered: signpostN >= 2,
-    detail: `${signpostN} essay-like transition(s) (furthermore, in conclusion, …)`,
+    weight: 12,
+    triggered: signpostN >= 1,
+    partial: Math.min(1, signpostN / 2),
+    detail: `${signpostN} essay-like transition(s)`,
   });
 
-  const { cv, detail: cvDetail } = sentenceCv(text);
-  const sentenceN = text.split(/(?<=[.!?])\s+/).filter((s) => s.trim()).length;
+  const { cv, n: sentenceN, detail: cvDetail } = sentenceCv(text);
   signals.push({
     id: "uniform_sentences",
     label: SIGNAL_LABELS.uniform_sentences,
     count: sentenceN,
-    weight: 10,
-    triggered: sentenceN >= 4 && cv < 0.35,
+    weight: 14,
+    triggered: sentenceN >= 3 && cv < 0.45,
+    partial: sentenceN >= 3 ? Math.max(0, (0.55 - cv) / 0.55) : 0,
     detail: cvDetail,
+  });
+
+  const literary = literaryPhraseHits(text);
+  signals.push({
+    id: "literary_phrasing",
+    label: SIGNAL_LABELS.literary_phrasing,
+    count: literary.total,
+    weight: 16,
+    triggered: literary.total >= 2,
+    partial: Math.min(1, literary.total / 4),
+    detail: literary.parts.length ? literary.parts.join("; ") : "none detected",
+  });
+
+  const participial = (text.match(/,\s+[a-z]+ing\b/gi) || []).length;
+  const partPer100 = (participial / wc) * 100;
+  signals.push({
+    id: "participial_chains",
+    label: SIGNAL_LABELS.participial_chains,
+    count: participial,
+    weight: 12,
+    triggered: participial >= 2 || partPer100 >= 1.2,
+    partial: Math.min(1, partPer100 / 1.5),
+    detail: `${participial} participial phrase(s) (, watching… / , feeling…)`,
+  });
+
+  const contractions = (text.match(CONTRACTIONS) || []).length;
+  const contrPer100 = (contractions / wc) * 100;
+  const lowContr = wc >= 80 && contrPer100 < 0.5;
+  signals.push({
+    id: "low_contractions",
+    label: SIGNAL_LABELS.low_contractions,
+    count: contractions,
+    weight: 10,
+    triggered: lowContr,
+    partial: wc >= 80 ? Math.max(0, (0.6 - contrPer100) / 0.6) : 0,
+    detail: `${contractions} contraction(s) (${contrPer100.toFixed(2)} per 100 words — LLM prose often avoids them)`,
   });
 
   const listBlocks = (text.match(/(?:^|\n)\s*(?:\d+[.)]|[-*•])\s+\S/gm) || []).length;
@@ -165,19 +239,23 @@ export function quickCheck(text) {
     id: "list_heavy",
     label: SIGNAL_LABELS.list_heavy,
     count: listBlocks,
-    weight: 8,
+    weight: 6,
     triggered: listBlocks >= 3,
-    detail: `${listBlocks} list item line(s)`,
+    partial: Math.min(1, listBlocks / 4),
+    detail: `${listBlocks} list line(s)`,
   });
 
-  const windup = /^(?:In (?:today's|the|an)|Throughout history|Since the dawn|When it comes to|In recent years)/i.test(text);
+  const windup = /^(?:In (?:today's|the|an)|Throughout history|Since the dawn|When it comes to|In recent years|The (?:sun|morning|night|air|wind))/i.test(
+    text
+  );
   signals.push({
     id: "generic_opener",
     label: SIGNAL_LABELS.generic_opener,
     count: windup ? 1 : 0,
     weight: 8,
     triggered: windup,
-    detail: windup ? "starts with a broad, essay-style opener" : "no generic opener",
+    partial: windup ? 1 : 0,
+    detail: windup ? "literary or essay-style opener" : "no generic opener",
   });
 
   const colonOpeners = (text.match(/\b\w[\w\s]{0,20}:\s/g) || []).length;
@@ -185,9 +263,10 @@ export function quickCheck(text) {
     id: "colon_opener",
     label: SIGNAL_LABELS.colon_opener,
     count: colonOpeners,
-    weight: 7,
-    triggered: colonOpeners >= 3,
-    detail: `${colonOpeners} clause(s) leading with a colon setup`,
+    weight: 6,
+    triggered: colonOpeners >= 2,
+    partial: Math.min(1, colonOpeners / 3),
+    detail: `${colonOpeners} colon setup(s)`,
   });
 
   const rhetQ = (text.match(/\?/g) || []).length;
@@ -195,17 +274,19 @@ export function quickCheck(text) {
     id: "rhetorical_questions",
     label: SIGNAL_LABELS.rhetorical_questions,
     count: rhetQ,
-    weight: 6,
+    weight: 5,
     triggered: rhetQ >= 2 && wc >= 80,
-    detail: `${rhetQ} question mark(s) in text`,
+    partial: Math.min(1, rhetQ / 3),
+    detail: `${rhetQ} question mark(s)`,
   });
 
   const maxPts = signals.reduce((a, s) => a + s.weight, 0);
-  const earned = signals.filter((s) => s.triggered).reduce((a, s) => a + s.weight, 0);
-  const surfaceScore = maxPts ? Math.min(100, (earned / maxPts) * 100) : 0;
+  const earned = signals.reduce((a, s) => a + contribute(s.weight, s.triggered, s.partial), 0);
+  const surfaceScore = Math.min(100, Math.round((earned / maxPts) * 1000) / 10);
+
   let surfaceVerdict = "low";
-  if (surfaceScore >= 55) surfaceVerdict = "high";
-  else if (surfaceScore >= 25) surfaceVerdict = "medium";
+  if (surfaceScore >= 50) surfaceVerdict = "high";
+  else if (surfaceScore >= 22) surfaceVerdict = "medium";
 
   return buildReport(wc, surfaceScore, signals, surfaceScore, surfaceVerdict);
 }
@@ -226,10 +307,6 @@ function buildReport(wc, aiPct, signals, surfaceScore, surfaceVerdict) {
     })),
     scan_mode: "quick",
     disclaimer:
-      "Heuristic signals only — not proof. Em dashes and polished prose appear in human writing too. Runs in your browser; nothing is uploaded.",
+      "Surface-pattern scan only — literary AI (Claude, etc.) often scores low. Not proof. Nothing is uploaded.",
   };
-}
-
-export function toApiShape(report) {
-  return { ok: true, report };
 }

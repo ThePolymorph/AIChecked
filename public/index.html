@@ -52,14 +52,11 @@
         </div>
         <div class="scanner__actions">
           <button type="button" class="btn btn--primary" id="btnQuick">
-            <span class="btn__icon">⚡</span> Quick scan
-          </button>
-          <button type="button" class="btn btn--secondary" id="btnDeep">
-            <span class="btn__icon">🔬</span> Deep scan
+            <span class="btn__icon">⚡</span> Scan
           </button>
           <button type="button" class="btn btn--ghost" id="btnClear">Clear</button>
         </div>
-        <p class="scanner__hint" id="scanHint">Quick scan is instant. Deep scan loads local GPT-2 models (~1.5 GB) and may take 10–30s on CPU.</p>
+        <p class="scanner__hint" id="scanHint">Runs in your browser — instant and private. Surface patterns only; polished AI may slip through.</p>
       </div>
 
       <div class="results" id="results" hidden>
@@ -117,22 +114,22 @@
     </section>
 
     <section class="how" id="how">
-      <h2>Two layers, one report</h2>
+      <h2>How it works</h2>
       <div class="how__grid">
         <article class="how__card">
           <span class="how__num">01</span>
           <h3>Surface scan</h3>
-          <p>Milliseconds. Flags em dashes, rhetorical triplets, ChatGPT-era buzzwords, essay transitions, and overly uniform sentence rhythm.</p>
+          <p>Flags em dashes, literary phrasing, participial chains, buzzwords, uniform rhythm, and essay transitions — in your browser, instantly.</p>
         </article>
         <article class="how__card">
           <span class="how__num">02</span>
-          <h3>Deep scan</h3>
-          <p>Binoculars cross-perplexity (Hans et al., 2024) with GPT-2 observer + performer. Harder to fool than pattern matching alone.</p>
+          <h3>Private by design</h3>
+          <p>Text never leaves your device. No account, no API keys, no upload. Good for ad-hoc checks on essays, emails, and drafts.</p>
         </article>
         <article class="how__card">
           <span class="how__num">03</span>
-          <h3>Combined verdict</h3>
-          <p>Weighted merge when both run. Always treat output as a signal — short text and polished human writing can false-flag.</p>
+          <h3>Know the limits</h3>
+          <p>Polished literary AI (Claude, GPT-4) often avoids obvious tells. This is a red-flag pass, not forensic proof. Use your judgment.</p>
         </article>
       </div>
     </section>
@@ -143,6 +140,6 @@
     <p class="footer__fine">Inspired by Binoculars (Hans et al., 2024) and DetectGPT (Mitchell et al., 2023). Runs locally with open-source models.</p>
   </footer>
 
-  <script src="/js/app.js" type="module"></script>
+  <script src="/js/app.js?v=4" type="module"></script>
 </body>
 </html>

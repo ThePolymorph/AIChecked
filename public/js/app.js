@@ -1,11 +1,10 @@
-import { quickCheck, toApiShape } from "./heuristics.js";
+import { quickCheck } from "./heuristics.js?v=4";
 
 const $ = (sel) => document.querySelector(sel);
 
 const inputText = $("#inputText");
 const wordCount = $("#wordCount");
 const btnQuick = $("#btnQuick");
-const btnDeep = $("#btnDeep");
 const btnClear = $("#btnClear");
 const scanLine = $("#scanLine");
 const results = $("#results");
@@ -21,20 +20,15 @@ const scanMode = $("#scanMode");
 const surfaceScore = $("#surfaceScore");
 const confidence = $("#confidence");
 const deepCard = $("#deepCard");
-const binoculars = $("#binoculars");
-const logPpl = $("#logPpl");
-const binoLabel = $("#binoLabel");
-const pplLabel = $("#pplLabel");
-const deepWarning = $("#deepWarning");
 const signalsEl = $("#signals");
 const disclaimer = $("#disclaimer");
 
 const GAUGE_ARC = 251.2;
 
 const VERDICT_COPY = {
-  likely_human: "Few AI surface patterns detected. Still not proof of human authorship.",
-  uncertain: "Mixed signals — could be edited human prose or polished AI output. Read critically.",
-  likely_ai: "Multiple AI tells detected. Still not proof — use judgment.",
+  likely_human: "Few surface patterns — but polished AI (Claude, GPT-4) often looks like this. Not proof of human authorship.",
+  uncertain: "Mixed surface signals — could be edited human prose or polished AI. Read critically.",
+  likely_ai: "Multiple AI surface patterns detected. Still not proof — use judgment.",
 };
 
 function countWords(text) {
@@ -52,7 +46,6 @@ function setScanning(on) {
   scanner.classList.toggle("is-scanning", on);
   scanLine.classList.toggle("active", on);
   btnQuick.disabled = on;
-  btnDeep.disabled = on;
 }
 
 function gaugeColor(pct) {
@@ -114,16 +107,7 @@ function renderReport(report) {
   confidence.textContent = report.confidence;
   renderSignals(report.signals);
   disclaimer.textContent = report.disclaimer;
-  deepCard.hidden = true;
-}
-
-async function parseJsonResponse(res) {
-  const text = await res.text();
-  try {
-    return JSON.parse(text);
-  } catch {
-    throw new Error("Server returned an invalid response.");
-  }
+  if (deepCard) deepCard.hidden = true;
 }
 
 function runQuickScan() {
@@ -134,12 +118,12 @@ function runQuickScan() {
     return;
   }
   setScanning(true);
-  scanHint.textContent = "Running surface scan in your browser…";
+  scanHint.textContent = "Scanning…";
   scanHint.style.color = "";
   requestAnimationFrame(() => {
     try {
       renderReport(quickCheck(text));
-      scanHint.textContent = "Scan complete. Text never left your device.";
+      scanHint.textContent = "Done. Text never left your device.";
     } catch (err) {
       scanHint.textContent = err.message || "Scan failed.";
       scanHint.style.color = "var(--coral)";
@@ -149,42 +133,14 @@ function runQuickScan() {
   });
 }
 
-async function runDeepScan() {
-  const text = inputText.value.trim();
-  if (!text) {
-    scanHint.textContent = "Paste some text first.";
-    scanHint.style.color = "var(--coral)";
-    return;
-  }
-  setScanning(true);
-  scanHint.textContent = "Contacting deep scan API…";
-  try {
-    const res = await fetch("/api/scan", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, mode: "full" }),
-    });
-    const data = await parseJsonResponse(res);
-    if (!res.ok) throw new Error(data.detail || "Deep scan unavailable");
-    renderReport(data.report);
-  } catch (err) {
-    scanHint.textContent =
-      err.message || "Deep scan requires self-hosted deployment. Quick scan runs locally in your browser.";
-    scanHint.style.color = "var(--coral)";
-  } finally {
-    setScanning(false);
-  }
-}
-
 btnQuick.addEventListener("click", runQuickScan);
-btnDeep.addEventListener("click", runDeepScan);
 
 btnClear.addEventListener("click", () => {
   inputText.value = "";
   updateWordCount();
   results.hidden = true;
   emptyState.hidden = false;
-  scanHint.textContent = "Quick scan runs in your browser — instant, private, no server needed.";
+  scanHint.textContent = "Runs in your browser — instant and private. Surface patterns only; polished AI may slip through.";
   scanHint.style.color = "";
 });
 
@@ -199,15 +155,6 @@ if (svg && !svg.querySelector("defs")) {
     <stop offset="100%" stop-color="#ff6b4c"/>
   </linearGradient>`;
   svg.prepend(defs);
-}
-
-// Public site: quick scan is client-side; hide deep scan on Vercel/static hosts
-btnDeep.hidden = true;
-scanHint.textContent = "Quick scan runs in your browser — instant, private, no server needed.";
-const deepHow = document.querySelector(".how__card:nth-child(2) p");
-if (deepHow) {
-  deepHow.textContent =
-    "Binoculars statistical scan is available when you self-host the Python stack locally — not on the free static site.";
 }
 
 updateWordCount();
