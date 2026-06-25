@@ -921,6 +921,13 @@ textarea::placeholder { color: #5a6a85; }
   margin-bottom: 0;
 }
 
+.prompt-section__note {
+  margin: 0 0 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 .prompt-section__actions {
   display: flex;
   align-items: center;

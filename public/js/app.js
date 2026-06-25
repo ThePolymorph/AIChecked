@@ -51,9 +51,7 @@ const HUMANIZER_PROMPT_PLAIN = `Write in a natural human voice. Follow every rul
 - Don't stack sentences that all start the same way. Avoid line after line opening with Sometimes, Often, And, But, or So.
 - Drop the reader into a scene with "you" or "I", not only flat observations about "they" or "it".
 - Use specific details (a grey tabby, two seconds, the top of the fridge) instead of tidy generic similes.
-- Plain doesn't mean every line is a short subject-verb sentence. One longer, messier sentence is fine.
-
-When done, check the draft at AIChecked.com before you submit.`;
+- Plain doesn't mean every line is a short subject-verb sentence. One longer, messier sentence is fine.`;
 
 const VERDICT_COPY = {
   likely_human: "Some surface patterns lean human. Still not proof, especially on short or literary text.",
