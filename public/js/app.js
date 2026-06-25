@@ -11,7 +11,6 @@ const btnQuick = $("#btnQuick");
 const btnClear = $("#btnClear");
 const btnCopyPrompt = $("#btnCopyPrompt");
 const copyPromptFeedback = $("#copyPromptFeedback");
-const humanizerPromptEl = $("#humanizerPromptText");
 const scanLine = $("#scanLine");
 const results = $("#results");
 const emptyState = $("#emptyState");
