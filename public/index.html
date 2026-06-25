@@ -3,15 +3,63 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AIChecked — AI Writing Scanner</title>
-  <meta name="description" content="Instant AI text checker. Surface-pattern scan plus optional deep Binoculars statistical analysis. Free, local, no API keys." />
-  <meta property="og:title" content="AIChecked — AI Writing Scanner" />
-  <meta property="og:description" content="Check text for AI writing patterns and statistical signals." />
-  <meta property="og:url" content="https://aichecked.com" />
+  <title>AIChecked — Free AI Text Detector &amp; ChatGPT Writing Checker</title>
+  <meta name="description" content="Free AI writing checker and text detector. Scan essays, emails, and articles for ChatGPT, Claude, and LLM patterns in your browser — private, instant, no upload." />
+  <meta name="keywords" content="AI detector, AI text detector, AI writing checker, ChatGPT detector, Claude AI checker, detect AI writing, AI generated text, LLM detector, machine generated text, AI content checker, free AI checker, GPT detector, essay AI checker, plagiarism AI, AIChecked" />
+  <meta name="author" content="AIChecked" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://aichecked.com/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AIChecked" />
+  <meta property="og:title" content="AIChecked — Free AI Text Detector &amp; Writing Checker" />
+  <meta property="og:description" content="Check if text was written by AI. Free browser-based scanner for ChatGPT, Claude, and LLM writing patterns. Private — nothing uploaded." />
+  <meta property="og:url" content="https://aichecked.com/" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="AIChecked — Free AI Text Detector" />
+  <meta name="twitter:description" content="Instant, private AI writing checker. Detect ChatGPT, Claude, and LLM surface patterns in your browser." />
+
   <meta name="theme-color" content="#060a12" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-3PXBR685H8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-3PXBR685H8");
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "AIChecked",
+    "url": "https://aichecked.com/",
+    "description": "Free AI text detector and writing checker. Scan for ChatGPT, Claude, and LLM patterns privately in your browser.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "AI text detection",
+      "ChatGPT writing checker",
+      "Claude AI pattern scan",
+      "Browser-based private scan",
+      "No upload required"
+    ]
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Syne:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
 </head>
@@ -35,8 +83,8 @@
   <main class="main">
     <section class="hero">
       <p class="hero__eyebrow">Training-free detection</p>
-      <h1 class="hero__title">Scan writing for<br /><span class="gradient-text">AI fingerprints</span></h1>
-      <p class="hero__sub">Instant surface-pattern check in your browser. Private — text never uploaded. Signals, not proof.</p>
+      <h1 class="hero__title">Free AI text detector —<br /><span class="gradient-text">check writing for AI</span></h1>
+      <p class="hero__sub">Paste an essay, email, or article. Instantly scan for ChatGPT, Claude, and LLM writing patterns — in your browser, private, nothing uploaded.</p>
     </section>
 
     <section class="scanner" id="scanner">
@@ -108,7 +156,7 @@
 
       <div class="empty-state" id="emptyState">
         <div class="empty-state__icon" aria-hidden="true">◎</div>
-        <p>Paste text and hit <strong>Quick scan</strong> for em dashes, rule-of-three, buzzwords, and more.</p>
+        <p>Paste text and hit <strong>Scan</strong> for em dashes, rule-of-three, buzzwords, and more.</p>
       </div>
     </section>
 
@@ -132,6 +180,20 @@
         </article>
       </div>
     </section>
+
+    <section class="seo" id="about" aria-label="About AIChecked">
+      <h2>Free AI writing checker</h2>
+      <p>
+        <strong>AIChecked</strong> is a free AI text detector for students, editors, and teachers who need a quick
+        read on whether writing might be machine-generated. Check essays, blog posts, cover letters, and emails for
+        surface patterns common in <strong>ChatGPT</strong>, <strong>Claude</strong>, <strong>GPT-4</strong>, and other
+        large language models — em dashes, rule-of-three lists, AI buzzwords, uniform sentence rhythm, and literary LLM phrasing.
+      </p>
+      <p>
+        Unlike upload-based AI content checkers, AIChecked runs entirely in your browser. Your text is never sent to a server.
+        Results are signals, not proof — polished AI writing can still score low. Use alongside your own judgment.
+      </p>
+    </section>
   </main>
 
   <footer class="footer">
@@ -139,6 +201,6 @@
     <p class="footer__fine">Inspired by Binoculars (Hans et al., 2024) and DetectGPT (Mitchell et al., 2023). Runs locally with open-source models.</p>
   </footer>
 
-  <script src="/js/app.js?v=5" type="module"></script>
+  <script src="/js/app.js?v=6" type="module"></script>
 </body>
 </html>

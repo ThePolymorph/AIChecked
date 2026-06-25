@@ -133,6 +133,12 @@ function runQuickScan() {
     try {
       renderReport(quickCheck(text));
       scanHint.textContent = "Done. Text never left your device.";
+      if (typeof gtag === "function") {
+        gtag("event", "scan_complete", {
+          word_count: countWords(text),
+          event_category: "engagement",
+        });
+      }
     } catch (err) {
       scanHint.textContent = err.message || "Scan failed.";
       scanHint.style.color = "var(--coral)";

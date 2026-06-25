@@ -498,6 +498,27 @@ textarea::placeholder { color: #5a6a85; }
   padding: 3rem 0 4rem;
   border-top: 1px solid var(--border);
 }
+
+.seo {
+  padding: 0 0 3rem;
+  max-width: 40rem;
+  margin: 0 auto;
+}
+.seo h2 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+}
+.seo p {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  margin: 0 0 1rem;
+}
+.seo p:last-child { margin-bottom: 0; }
+
 .how h2 {
   font-family: var(--font-display);
   font-size: 1.75rem;
