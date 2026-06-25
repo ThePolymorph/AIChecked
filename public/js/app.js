@@ -1,4 +1,4 @@
-import { quickCheck } from "./heuristics.js?v=11";
+import { quickCheck } from "./heuristics.js?v=13";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -41,17 +41,17 @@ const HUMANIZER_PROMPT_PLAIN = `Write in a natural human voice. Follow every rul
 
 - Use contractions where a real person would (don't, can't, it's).
 - Vary sentence length. Mix short lines with longer ones.
+- Vary how each sentence begins. Neighbouring lines shouldn't share the same shape or rhythm.
+- Mix modes: direct address, a brief anecdote, a question, or a longer thought with a because or although clause.
+- Not every line should stand alone as a tidy observation. Let some sentences lean on the one before them.
+- Name concrete details (people, places, numbers, odd specifics) instead of polished generalities.
 - No parallel lists of three (avoid "fast, reliable, and scalable").
 - Skip AI buzzwords: delve, landscape, crucial, seamless, foster, leverage, pivotal, tapestry, multifaceted, palpable.
 - No essay transitions: furthermore, moreover, in conclusion, it's important to note.
 - Limit em dashes. Prefer commas or a new sentence.
 - Avoid participial tag-ons (, watching the tide, , feeling the weight).
 - Avoid filler like "the way she", "as if", and "something about".
-- No throat-clearing openers (In today's world, Throughout history).
-- Don't stack sentences that all start the same way. Avoid line after line opening with Sometimes, Often, And, But, or So.
-- Drop the reader into a scene with "you" or "I", not only flat observations about "they" or "it".
-- Use specific details (a grey tabby, two seconds, the top of the fridge) instead of tidy generic similes.
-- Plain doesn't mean every line is a short subject-verb sentence. One longer, messier sentence is fine.`;
+- No throat-clearing openers (In today's world, Throughout history).`;
 
 const VERDICT_COPY = {
   likely_human: "Some surface patterns lean human. Still not proof, especially on short or literary text.",

@@ -91,35 +91,66 @@ const SIGNAL_TOOLTIPS = {
   participial_chains:
     "Trailing phrases like , watching the tide or , feeling the air. Common in literary AI prose.",
   artificial_simplicity:
-    "Many short chatty lines opening with Sometimes, Often, And, But, or So. Humanised drafts often overdo plain subject-verb sentences.",
+    "Too many short declarative lines, adverb-led openers, or compound sentences starting with And/But/So. Common in humanised AI drafts.",
 };
 
 const CONTRACTIONS =
   /\b(?:don't|won't|can't|it's|that's|there's|I'm|I've|you're|they're|we're|isn't|aren't|wasn't|weren't|doesn't|didn't|haven't|hasn't|couldn't|wouldn't|shouldn't|I'll|we'll|she's|he's)\b/gi;
 
-const CHATTY_STARTERS = /^(?:Sometimes|Often|Usually|Generally|Typically|And|But|So|Then|Also|Maybe|Perhaps|Honestly|Really|Plus)\b/i;
+const SENTENCE_INITIAL_ADVERB =
+  /^(?:\w+ly|Sometimes|Often|Usually|Generally|Typically|Maybe|Perhaps|Really|Honestly|Then|Also|Plus|Still|Even|Never|Always|Just|Only|Here|There|Now|Later|Today|Yesterday)\b/i;
+const SENTENCE_INITIAL_CONJ = /^(?:And|But|Or|So|Yet|Nor)\b/i;
+const SUBORDINATE_MARKERS =
+  /\b(?:because|when|if|although|while|though|since|unless|until|who|which|where|after|before|whereas|whenever|wherever|whether)\b/i;
 
-function chattyOpeners(text) {
-  const sentences = text
+function splitSentences(text) {
+  return text
     .split(/(?<=[.!?])\s+/)
     .map((s) => s.trim())
     .filter(Boolean);
-  if (sentences.length < 3) {
-    return { total: 0, sometimes: 0, sentences: sentences.length, ratio: 0 };
+}
+
+function isSimpleDeclarative(sentence) {
+  const stripped = sentence.replace(/[.!?]+$/, "").trim();
+  const words = stripped.split(/\s+/).filter(Boolean);
+  const wc = words.length;
+
+  if (wc < 4) return true;
+  if (wc > 22) return false;
+  if (/^(?:You|I|We|My)\b/i.test(stripped)) return false;
+  if (SUBORDINATE_MARKERS.test(stripped)) return false;
+
+  const commas = (stripped.match(/,/g) || []).length;
+  if (commas >= 2) return false;
+  if (SENTENCE_INITIAL_CONJ.test(stripped)) return true;
+  if (wc <= 16 && commas <= 1) return true;
+  return false;
+}
+
+function analyzeArtificialSimplicity(text) {
+  const sentences = splitSentences(text);
+  const n = sentences.length;
+  if (n < 3) {
+    return { simple: 0, adverbOpen: 0, conjOpen: 0, sentences: n, simpleRatio: 0 };
   }
 
-  let total = 0;
-  let sometimes = 0;
+  let simple = 0;
+  let adverbOpen = 0;
+  let conjOpen = 0;
+
   for (const s of sentences) {
-    if (/^Sometimes\b/i.test(s)) {
-      sometimes += 1;
-      total += 1;
-    } else if (CHATTY_STARTERS.test(s)) {
-      total += 1;
-    }
+    if (SENTENCE_INITIAL_ADVERB.test(s)) adverbOpen += 1;
+    if (SENTENCE_INITIAL_CONJ.test(s)) conjOpen += 1;
+    if (isSimpleDeclarative(s)) simple += 1;
   }
 
-  return { total, sometimes, sentences: sentences.length, ratio: total / sentences.length };
+  return {
+    simple,
+    adverbOpen,
+    conjOpen,
+    sentences: n,
+    simpleRatio: simple / n,
+  };
 }
 
 function wordCount(text) {
@@ -337,21 +368,26 @@ export function quickCheck(text) {
     detail: `${rhetQ} question mark(s)`,
   });
 
-  const chatty = chattyOpeners(text);
+  const chatty = analyzeArtificialSimplicity(text);
   const chattyTriggered =
-    chatty.sometimes >= 2 ||
-    (chatty.total >= 3 && chatty.ratio >= 0.2) ||
-    chatty.total >= 4;
-  let chattyDetail = `${chatty.total} chatty opener(s) in ${chatty.sentences} sentence(s)`;
-  if (chatty.sometimes) chattyDetail += ` (${chatty.sometimes}× Sometimes…)`;
+    (chatty.simpleRatio >= 0.55 && chatty.sentences >= 6) ||
+    (chatty.simple >= 5 && chatty.simpleRatio >= 0.45) ||
+    chatty.adverbOpen >= 2 ||
+    chatty.conjOpen >= 2 ||
+    (chatty.adverbOpen + chatty.conjOpen >= 3 && chatty.sentences >= 5);
+  const parts = [`${chatty.simple}/${chatty.sentences} simple declarative`];
+  if (chatty.adverbOpen) parts.push(`${chatty.adverbOpen} adverb opener(s)`);
+  if (chatty.conjOpen) parts.push(`${chatty.conjOpen} conjunction opener(s)`);
   signals.push({
     id: "artificial_simplicity",
     label: SIGNAL_LABELS.artificial_simplicity,
-    count: chatty.total,
-    weight: 12,
+    count: chatty.simple,
+    weight: 14,
     triggered: chattyTriggered,
-    partial: Math.min(1, chatty.total / 4) * Math.min(1, chatty.ratio / 0.25),
-    detail: chattyDetail,
+    partial:
+      Math.min(1, chatty.simpleRatio / 0.6) * 0.6 +
+      Math.min(1, (chatty.adverbOpen + chatty.conjOpen) / 4) * 0.4,
+    detail: parts.join("; "),
   });
 
   const maxPts = signals.reduce((a, s) => a + s.weight, 0);

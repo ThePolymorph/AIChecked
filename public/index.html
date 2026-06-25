@@ -189,13 +189,17 @@
         <h2>LLM humaniser prompt</h2>
         <p class="prompt-section__lead">
           Paste this into ChatGPT, Claude, or Gemini <strong>before</strong> you ask it to write or rewrite.
-          It targets surface patterns AIChecked scans for, including the "artificial simplicity" trap: too many short lines opening with Sometimes, And, or But.
+          It targets the surface patterns AIChecked scans for, including uniform chatty rhythm and over-simple sentence shapes.
         </p>
         <blockquote class="prompt-quote" id="humanizerPromptText">
           <p>Write in a natural human voice. Follow every rule:</p>
           <ul>
             <li>Use contractions where a real person would (don't, can't, it's).</li>
             <li>Vary sentence length. Mix short lines with longer ones.</li>
+            <li>Vary how each sentence begins. Neighbouring lines shouldn't share the same shape or rhythm.</li>
+            <li>Mix modes: direct address, a brief anecdote, a question, or a longer thought with a because or although clause.</li>
+            <li>Not every line should stand alone as a tidy observation. Let some sentences lean on the one before them.</li>
+            <li>Name concrete details (people, places, numbers, odd specifics) instead of polished generalities.</li>
             <li>No parallel lists of three (avoid "fast, reliable, and scalable").</li>
             <li>Skip AI buzzwords: delve, landscape, crucial, seamless, foster, leverage, pivotal, tapestry, multifaceted, palpable.</li>
             <li>No essay transitions: furthermore, moreover, in conclusion, it's important to note.</li>
@@ -203,10 +207,6 @@
             <li>Avoid participial tag-ons (, watching the tide, , feeling the weight).</li>
             <li>Avoid filler like "the way she", "as if", and "something about".</li>
             <li>No throat-clearing openers (In today's world, Throughout history).</li>
-            <li>Don't stack sentences that all start the same way. Avoid line after line opening with Sometimes, Often, And, But, or So.</li>
-            <li>Drop the reader into a scene with "you" or "I", not only flat observations about "they" or "it".</li>
-            <li>Use specific details (a grey tabby, two seconds, the top of the fridge) instead of tidy generic similes.</li>
-            <li>Plain doesn't mean every line is a short subject-verb sentence. One longer, messier sentence is fine.</li>
           </ul>
         </blockquote>
         <p class="prompt-section__note">When you're done, check the draft here at <strong>AIChecked.com</strong> before you submit.</p>
@@ -266,6 +266,6 @@
     <p class="footer__fine">Inspired by Binoculars (Hans et al., 2024) and DetectGPT (Mitchell et al., 2023). Runs locally with open-source models.</p>
   </footer>
 
-  <script src="/js/app.js?v=12" type="module"></script>
+  <script src="/js/app.js?v=13" type="module"></script>
 </body>
 </html>
