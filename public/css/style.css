@@ -108,7 +108,8 @@ body {
   font-size: 0.9rem;
   transition: color 0.2s;
 }
-.header__nav a:hover { color: var(--accent); }
+.header__nav a:hover,
+.header__nav a[aria-current="page"] { color: var(--accent); }
 
 .hero {
   padding: 2.5rem 0 2rem;
